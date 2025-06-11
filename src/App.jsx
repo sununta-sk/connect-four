@@ -1,8 +1,11 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import "./styles.css";
+import { db } from "./firebase";
+import {ref, set, get} from "firebase/database";
 
 function App() {
+  const uploadAddress = ref(db, "game");
   const numbers = [
     [0, 1, 2, 3, 4, 5],
     [6, 7, 8, 9, 10, 11],
@@ -157,6 +160,16 @@ function App() {
     setGame(gameState);
   };
 
+  const uploadGame = () => {
+    set(uploadAddress, game);
+  };
+
+  const downloadGame = () => {
+    get(uploadAddress).then((info) => {
+      setGame(info.val());
+    });
+  };
+
   useEffect(() => {
     checkWin();
     updateGame();
@@ -180,13 +193,8 @@ function App() {
           </div>
         ))}
       </div>
-      <p className="text-center text-2xl ">{JSON.stringify(game)}</p>
-      <input
-        className="border-2 border-black h-15 w-full"
-        placeholder="Enter game state"
-        onChange={(e) => setGame(e.target.value)}
-      />
-      <button>Enter</button>
+      <button onClick={uploadGame}>Upload</button>
+      <button onClick={downloadGame}>Download</button>
     </>
   );
 }
